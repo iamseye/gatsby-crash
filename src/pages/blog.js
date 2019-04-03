@@ -8,13 +8,13 @@ const BlogPage = ({ data }) => (
   <Layout>
     <SEO title="Blog" />
     <h1>Latest Posts</h1>
-    {data.allMarkdownRemark.edges.map(post => (
+    {data.allContentfulPost.edges.map(post => (
         <div key={post.node.id}>
-            <h3>{post.node.frontmatter.title}</h3>
-            <small>Post by {post.node.frontmatter.author} on {post.node.frontmatter.date}</small>
+            <h3>{post.node.title}</h3>
+            <small>Post by {post.node.author} on {post.node.date}</small>
             <br />
             <br />
-            <Link to={post.node.frontmatter.path}> Read More</Link>
+            <Link to={`/blog-post/${post.node.id}`}> Read More </Link>
             <br />
             <br />
             <hr />
@@ -25,16 +25,13 @@ const BlogPage = ({ data }) => (
 
 export const pageQuery = graphql `
     query BlogIndexQuery {  
-        allMarkdownRemark {
+        allContentfulPost {
             edges {
                 node {
                     id
-                    frontmatter {
-                    path
                     title
-                    date 
+                    date(formatString: "MMM DD, YYYY")
                     author
-                    }
                 }
             }
         }

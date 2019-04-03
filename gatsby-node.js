@@ -6,40 +6,43 @@
 
 // You can delete this file if you're not using it
 
-const path = require('path')
+const path = require(`path`);
+const slash = require(`slash`);
 
-exports.createPages = ({ boundActionCreators, graphql }) => {
-  const { createPage } = boundActionCreators
-
-  const postTemplate = path.resolve('src/templates/blog-post.js')
-
-  return graphql(`
-    {
-      allMarkdownRemark {
-        edges {
-          node {
-            html
-            id
-            frontmatter {
-              path
-              title
-              date
-              author
+exports.createPages = ({ graphql, actions }) => {
+  const { createPage } = actions;
+  // we use the provided allContentfulBlogPost query to fetch the data from Contentful
+  return graphql(
+    `
+      {
+        allContentfulPost {
+          edges {
+            node {
+              id
             }
           }
         }
       }
-    }
-  `).then(res => {
-    if (res.errors) {
-      return Promise.reject(res.errors)
-    }
+    `
+  ).then(result => {
+      if (result.errors) {
+        console.log('Error retrieving contentful data', result.errors);
+      }
+      // Resolve the paths to our template
+      const blogPostTemplate = path.resolve('./src/templates/blog-post.js');
+      // Then for each result we create a page.
 
-    res.data.allMarkdownRemark.edges.forEach(({ node }) => {
-      createPage({
-        path: node.frontmatter.path,
-        component: postTemplate,
-      })
+      result.data.allContentfulPost.edges.forEach(edge => {
+        createPage({
+          path: `/blog-post/${edge.node.id}/`,
+          component: slash(blogPostTemplate),
+          context: {
+            id: edge.node.id,
+          }
+        });
+      });
     })
-  })
-}
+    .catch(error => {
+      console.log("Error retrieving contentful data", error);
+    });
+};

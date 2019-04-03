@@ -1,3 +1,5 @@
+require(`dotenv`).config({path: `.env`,})
+
 module.exports = {
   siteMetadata: {
     title: `Gatsby Crash`,
@@ -36,6 +38,13 @@ module.exports = {
     },
     `gatsby-plugin-catch-links`,
     `gatsby-transformer-remark`,
+    {
+      resolve: `gatsby-source-contentful`,
+      options: {
+        spaceId: process.env.CONTENTFUL_SPACE_ID,
+        accessToken: process.env.CONTENTFUL_DELIVERY_ACCESS_TOKEN,
+      },
+    },
     // this (optional) plugin enables Progressive Web App + Offline functionality
     // To learn more, visit: https://gatsby.dev/offline
     // 'gatsby-plugin-offline',
